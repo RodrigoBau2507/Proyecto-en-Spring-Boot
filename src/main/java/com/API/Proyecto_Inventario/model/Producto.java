@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,6 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 @JsonPropertyOrder
 @Table(name="producto")
 
@@ -42,8 +44,29 @@ public class Producto implements Serializable{
 	Integer piezas;
 	@Column(name = "categoria")
 	String categoria;
+	@Column(name = "email")
+	String email;
+	
+	public Producto() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	
+	
+	public Producto(Integer idProducto, String descripcion, String nombre, Double precio, Integer piezas,
+			String categoria, String email) {
+		super();
+		this.idProducto = idProducto;
+		this.descripcion = descripcion;
+		this.nombre = nombre;
+		this.precio = precio;
+		this.piezas = piezas;
+		this.categoria = categoria;
+		this.email = email;
+	}
+
+
+
 	public Integer getIdProducto() {
 		return idProducto;
 	}
@@ -79,6 +102,13 @@ public class Producto implements Serializable{
 	}
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	} 
 	
 	

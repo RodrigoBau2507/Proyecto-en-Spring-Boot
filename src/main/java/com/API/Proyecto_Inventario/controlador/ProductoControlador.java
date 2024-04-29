@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.API.Proyecto_Inventario.model.Producto;
+import com.API.Proyecto_Inventario.servicio.EmailService;
 import com.API.Proyecto_Inventario.servicio.IProductoServicio;
 
 
@@ -30,6 +31,9 @@ public class ProductoControlador {
 	
 	@Autowired
 	private IProductoServicio productoServi;
+	
+	@Autowired
+	private EmailService emailservi;
 	private static final Logger logger = LoggerFactory.getLogger(ProductoControlador.class);
 	
 	// creacion de la ruta para crear un nuevo producto 
@@ -37,23 +41,39 @@ public class ProductoControlador {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Producto create(@RequestBody Producto producto) {
 		logger.info("Producto a agregar: " + producto);
+		Producto saveProducto = productoServi.save(producto);
+		emailservi.enviarCorreoProductoGuardado(saveProducto.getEmail());
 		return productoServi.save(producto);
 	}
 	
 	
 	// creacion del servicio de put para modificar algun registro
-	@PutMapping("producto")
+	@PutMapping("producto/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto update(@RequestBody Producto producto) {
-		return productoServi.save(producto);
-	}
+	public Producto update(@PathVariable Integer id, @RequestBody Producto producto) {
+        Producto existingProduct = productoServi.findById(id);
+        if (existingProduct == null) {
+        	logger.warn("Producto no encontrado con el ID: " + id);
+        }
+        producto.setIdProducto(id); // Asegura que el ID del producto sea el mismo que el proporcionado en la ruta
+        Producto updatedProduct = productoServi.save(producto);
+        emailservi.enviarCorreoProductoModificado(updatedProduct.getEmail());
+        return updatedProduct;
+    }
 
 	// Creacion del servicio Delete para eliminar algun registro 
+
 	@DeleteMapping("producto/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Integer id) {
 		Producto productoDelete = productoServi.findById(id);
-		productoServi.delete(productoDelete);
+	    if (productoDelete != null) {
+	        productoServi.delete(productoDelete);
+	    } else {
+	        // Si el producto no existe, puedes manejar la situación de alguna manera, como lanzar una excepción o simplemente registrar un mensaje de error.
+	        logger.warn("Intento de eliminar un producto con ID no válido: " + id);
+	        // Aquí puedes lanzar una excepción, registrar un mensaje de error, etc.
+	    }
 	}
 	
 	// buscar por algun producto por su ID 
@@ -69,5 +89,8 @@ public class ProductoControlador {
 	public Iterable<Producto> show() {
 		return productoServi.findAll();
 	}
+	
+	
+	
 	
 }

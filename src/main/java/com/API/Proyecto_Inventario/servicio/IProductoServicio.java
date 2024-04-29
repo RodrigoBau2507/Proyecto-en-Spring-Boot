@@ -1,6 +1,5 @@
 package com.API.Proyecto_Inventario.servicio;
 
-
 import com.API.Proyecto_Inventario.model.Producto;
 
 public interface IProductoServicio {
